@@ -7,8 +7,8 @@ import { User, FullUser, UserRoles } from "../types";
 import {generateUserToken} from "../utils";
 
 const UserValidation = [
-  check('name').exists().trim().escape().not().isEmpty().isString(),
-  check('password').exists().trim().escape().not().isEmpty().isString(),
+  check('name').exists().escape().trim().not().isEmpty().isString(),
+  check('password').exists().escape().trim().not().isEmpty().isString(),
 ]
 
 const UserCreateValidation = [

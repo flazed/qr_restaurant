@@ -1,18 +1,23 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import { AdminPage, AdminProductsPage } from '@pages/admin';
+import { LoginPage } from '@pages/login';
 
-import { adminPaths } from './routes';
+import { paths } from './routes';
 
 export const router = createBrowserRouter([
   {
     children: [
       {
         element: <AdminProductsPage />,
-        path: adminPaths.adminProducts.path
+        path: paths.adminProducts.path
       }
     ],
     element: <AdminPage />,
-    path: adminPaths.adminMain.path
+    path: paths.adminMain.path
+  },
+  {
+    element: <LoginPage />,
+    path: paths.login.path
   }
 ]);

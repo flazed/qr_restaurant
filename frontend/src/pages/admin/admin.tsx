@@ -1,16 +1,40 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import {
-  Link, Outlet, useLocation
+  Link, Outlet, useLocation, useNavigate
 } from 'react-router-dom';
 
 import { Navbar, NavbarBrand } from '@nextui-org/react';
 import classNames from 'classnames';
 
-import { adminPaths } from '@shared/router';
+import {
+  UserBadge, clearToken, setToken
+} from '@entities/user';
+
+import { useUser } from '@shared/hooks';
+import { useAppDispatch, useAppSelector } from '@shared/lib';
+import { adminPaths, paths } from '@shared/router';
 
 export const AdminPage: FC = () => {
+  const dispatch = useAppDispatch();
+  const { token } = useAppSelector((store) => store.user);
+
   const location = useLocation();
+  const navigation = useNavigate();
+  const { getToken, isTokenValid } = useUser();
+  const localToken = getToken();
+
   const isCurrentRoute = (url: string): boolean => location.pathname === url;
+
+  useEffect(() => {
+    if (!isTokenValid()) {
+      dispatch(clearToken());
+      navigation(paths.login.path);
+    }
+
+    if (localToken && localToken !== token) {
+      dispatch(setToken(localToken));
+    }
+  }, [location, token]);
 
   return (
     <div>
@@ -21,6 +45,7 @@ export const AdminPage: FC = () => {
         <NavbarBrand>
           <p className="font-mono text-inherit text-3xl">La&apos;Vita</p>
         </NavbarBrand>
+        <UserBadge />
       </Navbar>
       <div className="flex">
         <div className="bg-gray-900 text-amber-50 h-[calc(100vh_-_64px)] w-[200px]">

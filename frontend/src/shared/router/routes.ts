@@ -21,4 +21,10 @@ export const adminPaths = {
   }
 };
 
-export const paths = { ...adminPaths };
+export const paths = {
+  login: {
+    path: '/login',
+    title: 'Логин'
+  },
+  ...adminPaths
+};
