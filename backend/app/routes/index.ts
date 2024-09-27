@@ -1,1 +1,2 @@
-export { productsApi, ProductValidation } from './products'
+export { productsApi } from './products'
+export { userApi } from './user'

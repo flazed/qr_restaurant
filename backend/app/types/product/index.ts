@@ -9,6 +9,10 @@ export type Product = {
   weightType: WeightType
 };
 
+export type ProductSQL = Omit<Product, 'inStopList'> & {
+  inStopList: number
+};
+
 export enum WeightType {
   Gramm = 1,
   Milligramm = 2

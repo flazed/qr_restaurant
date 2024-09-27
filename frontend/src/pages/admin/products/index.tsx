@@ -2,12 +2,12 @@ import { FC, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import {
-  Button, Image, Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader, Select, SelectItem, Textarea,
+  Button, Chip, Image, Input,
+  Modal, ModalBody, ModalContent,
+  ModalFooter, ModalHeader, Select,
+  SelectItem, Table, TableBody,
+  TableCell, TableColumn, TableHeader,
+  TableRow, Textarea, getKeyValue,
   useDisclosure
 } from '@nextui-org/react';
 
@@ -15,7 +15,11 @@ import {
   defaultProduct, useAddProductMutation, useGetProductsQuery
 } from '@entities/product';
 
-import { ProductWithoutID, WeightType } from '@shared/types';
+import {
+  Product, ProductWithoutID, WeightType
+} from '@shared/types';
+
+import { columns } from './products.table';
 
 export const AdminProductsPage: FC = () => {
   const { data: productList = [] } = useGetProductsQuery();
@@ -53,7 +57,7 @@ export const AdminProductsPage: FC = () => {
 
   const handleAlertClose = () => {
     alertOnClose();
-    handleCloseProductModal();
+    if (!isError) handleCloseProductModal();
   };
 
   const handleAddNewProduct = (form: ProductWithoutID) => {
@@ -66,6 +70,13 @@ export const AdminProductsPage: FC = () => {
     formattedData.weightType = Number(form.weightType);
     formattedData.inStopList = Boolean(form.inStopList);
 
+    if (
+      typeof form.preview === 'string'
+      && form.preview.trim().length === 0
+    ) {
+      delete formattedData.preview;
+    }
+
     setIsEdit(false);
     addProduct(formattedData)
       .unwrap()
@@ -76,14 +87,59 @@ export const AdminProductsPage: FC = () => {
       });
   };
 
+  const renderCell = (row: Product, columnKey: number | string) => {
+    if (columnKey === 'action') {
+      return null;
+    }
+
+    if (columnKey === 'inStopList') {
+      if (row.inStopList) {
+        return <Chip color="danger" variant="flat">true</Chip>;
+      }
+      return <Chip color="success" variant="flat">false</Chip>;
+    }
+
+    if (columnKey === 'price') {
+      return <span>{`${row.price} ₽`}</span>;
+    }
+
+    return getKeyValue(row, columnKey);
+  };
+
   return (
     <>
-      <Button
-        color="primary"
-        onPress={onOpen}
-      >
-        Создать блюдо
-      </Button>
+      <div className="flex flex-col gap-5">
+        <div className="flex justify-end">
+          <Button
+            color="primary"
+            endContent={<i className="fas fa-plus" />}
+            onPress={onOpen}
+            variant="shadow"
+          >
+            Добавить блюдо
+          </Button>
+        </div>
+        <Table aria-label="products table">
+          <TableHeader>
+            {columns.map((column) => (
+              <TableColumn key={column.key}>
+                {column.label}
+              </TableColumn>
+            ))}
+          </TableHeader>
+          <TableBody emptyContent="Пока блюд нет">
+            {productList.map((x) => (
+              <TableRow key={x.id}>
+                {(columnKey) => (
+                  <TableCell>
+                    {renderCell(x, columnKey)}
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
       <Modal
         isOpen={isOpen}
         onClose={handleCloseProductModal}
@@ -168,7 +224,7 @@ export const AdminProductsPage: FC = () => {
                           isInvalid={Boolean(errors.weightType?.message)}
                           label="Выберете тип веса"
                           onChange={(x) => onChange(x.target.value)}
-                          selectedKeys={[value]}
+                          selectedKeys={[String(value)]}
                           isRequired
                         >
                           <SelectItem key={WeightType.Gramm}>

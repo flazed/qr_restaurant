@@ -3,7 +3,7 @@ export type Product = {
   id: number
   inStopList: boolean
   name: string
-  preview: string
+  preview?: string
   price: number
   weight: number
   weightType: WeightType
