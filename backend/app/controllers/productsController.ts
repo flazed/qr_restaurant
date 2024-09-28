@@ -27,7 +27,7 @@ const getProducts = async (_: Request, res: Response) => {
         })
       }
 
-      res.json(formattedData)
+      return res.json(formattedData)
     })
 }
 
@@ -51,7 +51,7 @@ const addProduct = async (req: Request, res: Response) => {
       .then(() => res.status(200).json())
       .catch(() => res.status(400).json())
   } else {
-    res.status(400).json(errors)
+    return res.status(400).json(errors)
   }
 }
 

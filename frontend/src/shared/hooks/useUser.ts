@@ -1,6 +1,6 @@
-import { JwtPayload, jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
-import { FullUser } from '@shared/types';
+import { FullUser, UserToken } from '@shared/types';
 
 type UserUser = {
   getDecodedToken: () => Pick<FullUser, 'name' | 'role'> | null
@@ -9,7 +9,7 @@ type UserUser = {
 };
 
 export const useUser = (): UserUser => {
-  const decodeToken = (x: string) => jwtDecode(x) as JwtPayload & Pick<FullUser, 'name' | 'role'>;
+  const decodeToken = (x: string) => jwtDecode(x) as UserToken;
 
   const isTokenValid = () => {
     const token = localStorage.getItem('token');

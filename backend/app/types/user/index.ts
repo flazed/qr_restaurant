@@ -1,3 +1,5 @@
+import { JwtPayload } from "jsonwebtoken";
+
 export type User = {
   name: string,
   password: string
@@ -7,7 +9,12 @@ export type FullUser = User & {
   role: UserRoles
 }
 
+export type UserToken = {
+  name: string
+  role: UserRoles
+} & JwtPayload
+
 export enum UserRoles {
-  user = 1,
-  admin = 2
+  User = 1,
+  Admin = 2
 }

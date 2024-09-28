@@ -20,5 +20,12 @@ export const BaseQueryWithAuth = (url: string) => async (
     }
   })(args, api, extraOptions);
 
+  if (
+    result.error
+    && result.error.status === 401
+  ) {
+    api.dispatch({ type: 'user/clearToken' });
+  }
+
   return result;
 };

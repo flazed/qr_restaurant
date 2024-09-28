@@ -36,18 +36,14 @@ const createUser = async (req: Request, res: Response) => {
         'INSERT INTO users (name, password, role) VALUES (?, ?, ?)',
         [name, hashPassword, role]
       )
-        .then(() => {
-          res.status(200).send({ token })
-        })
-        .catch((_) => {
-          res.status(500).send('Error while add new user')
-        })
+        .then(() => res.status(200).send({ token }))
+        .catch((_) => res.status(500).send('Error while add new user'))
     } else {
-      res.status(400).json('Error while generate JWT-token')
+      return res.status(400).json('Error while generate JWT-token')
     }
 
   } else {
-    res.status(400).json(errors)
+    return res.status(400).json(errors)
   }
 }
 
@@ -69,19 +65,17 @@ const loginUser = async (req: Request, res: Response) => {
           const token = generateUserToken(user.name, user.role)
 
           if(validPass && token) {
-            res.status(200).send({ token })
+            return res.status(200).send({ token })
           } else {
-            res.status(400).json('Incorrect name or pass')
+            return res.status(400).json('Incorrect name or pass')
           }
         } else {
-          res.status(400).json('No find user with this name')
+          return res.status(400).json('No find user with this name')
         }
       })
-      .catch(() => {
-        res.status(500).json('Error while select user')
-      })
+      .catch(() => res.status(500).json('Error while select user'))
   } else {
-    res.status(400).json(errors)
+    return res.status(400).json(errors)
   }
 }
 

@@ -6,10 +6,11 @@ import {
   UserCreateValidation,
   UserValidation
 } from '../controllers/userController'
+import { authUser, isAdmin } from "../middleware/authUser";
 
 const router = Router()
 
-router.use('/create', UserCreateValidation, createUser)
+router.post('/create', authUser, isAdmin, UserCreateValidation, createUser)
 router.post('/login', UserValidation, loginUser)
 
 export const userApi = router
