@@ -1,5 +1,8 @@
-import { FC, useState } from 'react';
+import {
+  FC, useEffect, useState
+} from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Button, Chip, Image, Input,
@@ -15,6 +18,8 @@ import {
   defaultProduct, useAddProductMutation, useGetProductsQuery
 } from '@entities/product';
 
+import { useUser } from '@shared/hooks';
+import { paths } from '@shared/router';
 import {
   Product, ProductWithoutID, WeightType
 } from '@shared/types';
@@ -43,13 +48,18 @@ export const AdminProductsPage: FC = () => {
     setValue
   } = useForm<ProductWithoutID>({ defaultValues: defaultProduct });
 
+  const [productID, setProductID] = useState<null | number>(null);
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [productPreview, setProductPreview] = useState<string>('');
+  const { isAdmin } = useUser();
+  const navigate = useNavigate();
 
   const handleCloseProductModal = () => {
     onClose();
     clearErrors();
+    setIsEdit(false);
+    setProductPreview('');
     Object
       .entries(defaultProduct)
       .map(([key, value]) => setValue(key as keyof ProductWithoutID, value));
@@ -60,7 +70,7 @@ export const AdminProductsPage: FC = () => {
     if (!isError) handleCloseProductModal();
   };
 
-  const handleAddNewProduct = (form: ProductWithoutID) => {
+  const handleControlProduct = (form: ProductWithoutID) => {
     const formattedData = { ...form };
 
     formattedData.name = form.name.trim();
@@ -77,21 +87,30 @@ export const AdminProductsPage: FC = () => {
       delete formattedData.preview;
     }
 
-    setIsEdit(false);
-    addProduct(formattedData)
-      .unwrap()
-      .then(() => setIsError(false))
-      .catch(() => setIsError(true))
-      .finally(() => {
-        alertOnOpen();
-      });
+    if (!isEdit) {
+      addProduct(formattedData)
+        .unwrap()
+        .then(() => setIsError(false))
+        .catch(() => setIsError(true))
+        .finally(() => {
+          alertOnOpen();
+        });
+    }
+  };
+
+  const handleOpenProductEditModal = (x: Product) => {
+    const { id, ...data } = x;
+
+    setProductID(id);
+    Object
+      .entries(data)
+      .map(([key, value]) => setValue(key as keyof ProductWithoutID, value));
+    if (data.preview) setProductPreview(data.preview);
+    setIsEdit(true);
+    onOpen();
   };
 
   const renderCell = (row: Product, columnKey: number | string) => {
-    if (columnKey === 'action') {
-      return null;
-    }
-
     if (columnKey === 'inStopList') {
       if (row.inStopList) {
         return <Chip color="danger" variant="flat">true</Chip>;
@@ -103,8 +122,30 @@ export const AdminProductsPage: FC = () => {
       return <span>{`${row.price} ₽`}</span>;
     }
 
+    if (columnKey === 'actions') {
+      return (
+        <div className="inline-flex gap-3">
+          <Button
+            color="warning"
+            onClick={() => handleOpenProductEditModal(row)}
+            variant="flat"
+            isIconOnly
+          >
+            <i className="far fa-edit translate-x-0.5" />
+          </Button>
+          <Button color="danger" variant="flat" isIconOnly>
+            <i className="fas fa-trash-alt" />
+          </Button>
+        </div>
+      );
+    }
+
     return getKeyValue(row, columnKey);
   };
+
+  useEffect(() => {
+    if (!isAdmin()) navigate(paths.adminMain.path);
+  }, []);
 
   return (
     <>
@@ -147,12 +188,18 @@ export const AdminProductsPage: FC = () => {
         size="3xl"
       >
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">Создание блюда</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            <span>
+              {isEdit ? 'Редактирование' : 'Создание'}
+              {' '}
+              блюда
+            </span>
+          </ModalHeader>
           <ModalBody>
             <form
               className="flex flex-col gap-4"
               id="add-new-product"
-              onSubmit={handleSubmit(handleAddNewProduct)}
+              onSubmit={handleSubmit(handleControlProduct)}
             >
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-4">
@@ -333,7 +380,7 @@ export const AdminProductsPage: FC = () => {
               isLoading={isLoading}
               type="submit"
             >
-              Добавить
+              {isEdit ? 'Редактировать' : 'Добавить'}
             </Button>
           </ModalFooter>
         </ModalContent>

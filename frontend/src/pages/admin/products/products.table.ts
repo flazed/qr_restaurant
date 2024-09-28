@@ -8,6 +8,10 @@ export const columns = [
     label: 'NAME'
   },
   {
+    key: 'description',
+    label: 'DESCRIPTION'
+  },
+  {
     key: 'inStopList',
     label: 'IN STOP-LIST'
   },

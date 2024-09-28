@@ -20,7 +20,9 @@ export const AdminPage: FC = () => {
 
   const location = useLocation();
   const navigation = useNavigate();
-  const { getToken, isTokenValid } = useUser();
+  const {
+    getToken, isAdmin, isTokenValid
+  } = useUser();
   const localToken = getToken();
 
   const isCurrentRoute = (url: string): boolean => location.pathname === url;
@@ -50,19 +52,21 @@ export const AdminPage: FC = () => {
       <div className="flex">
         <div className="bg-gray-900 text-amber-50 h-[calc(100vh_-_64px)] w-[200px]">
           <div className="flex flex-col p-3 gap-2">
-            {Object.values(adminPaths).map((x) => (
-              <Link
-                className={classNames(
-                  'flex items-center gap-4 py-2 px-3 rounded transition',
-                  { 'bg-rose-500': isCurrentRoute(x.path), 'hover:bg-gray-700': !isCurrentRoute(x.path) }
-                )}
-                key={x.path}
-                to={x.path}
-              >
-                <i className={classNames(x.icon, 'basis-[20px] text-center')} />
-                {x.title}
-              </Link>
-            ))}
+            {Object.values(adminPaths)
+              .filter((x) => x.isAdmin === isAdmin() || !x.isAdmin)
+              .map((x) => (
+                <Link
+                  className={classNames(
+                    'flex items-center gap-4 py-2 px-3 rounded transition',
+                    { 'bg-rose-500': isCurrentRoute(x.path), 'hover:bg-gray-700': !isCurrentRoute(x.path) }
+                  )}
+                  key={x.path}
+                  to={x.path}
+                >
+                  <i className={classNames(x.icon, 'basis-[20px] text-center')} />
+                  {x.title}
+                </Link>
+              ))}
           </div>
         </div>
         <div className="p-10 grow-[1]">

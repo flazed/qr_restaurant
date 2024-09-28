@@ -16,6 +16,6 @@ export type FullUser = {
 export type UserToken = JwtPayload & Pick<FullUser, 'name' | 'role'>;
 
 export enum UserRoles {
-  admin = 2,
-  user = 1
+  Admin = 2,
+  User = 1
 }

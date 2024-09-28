@@ -1,10 +1,13 @@
 import { jwtDecode } from 'jwt-decode';
 
-import { FullUser, UserToken } from '@shared/types';
+import {
+  FullUser, UserRoles, UserToken
+} from '@shared/types';
 
 type UserUser = {
   getDecodedToken: () => Pick<FullUser, 'name' | 'role'> | null
   getToken: () => null | string,
+  isAdmin: () => boolean
   isTokenValid: () => boolean
 };
 
@@ -35,6 +38,15 @@ export const useUser = (): UserUser => {
       return null;
     },
     getToken: () => localStorage.getItem('token'),
+    isAdmin: () => {
+      if (isTokenValid()) {
+        const token = localStorage.getItem('token');
+        const { role } = decodeToken(token!);
+
+        return role === UserRoles.Admin;
+      }
+      return false;
+    },
     isTokenValid
   };
 };
