@@ -3,7 +3,7 @@ import { check, validationResult } from "express-validator";
 
 import { pool } from "../config";
 
-import {Product, ProductSQL, WeightType} from "../types";
+import { Product, ProductSQL, WeightType } from "../types";
 
 const ProductValidation = [
   check('name').exists().escape().trim().not().isEmpty().isString(),
@@ -17,18 +17,7 @@ const ProductValidation = [
 
 const getProducts = async (_: Request, res: Response) => {
   pool.query('SELECT * FROM products')
-    .then((data) => {
-      const formattedData: Product[] = []
-
-      for(const x of data[0] as ProductSQL[]) {
-        formattedData.push({
-          ...x,
-          inStopList: x.inStopList === 1
-        })
-      }
-
-      return res.json(formattedData)
-    })
+    .then((data) => res.json(data[0]))
 }
 
 const addProduct = async (req: Request, res: Response) => {
