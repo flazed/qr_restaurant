@@ -1,11 +1,44 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 
 import { BaseQueryWithAuth } from '@shared/api';
-import { JWTToken, User } from '@shared/types';
+import {
+  EditableUser,
+  FullUser,
+  JWTToken, User, UserWithId
+} from '@shared/types';
 
 export const userApi = createApi({
-  baseQuery: BaseQueryWithAuth('user'),
+  baseQuery: BaseQueryWithAuth('users'),
   endpoints: (builder) => ({
+    createUser: builder.mutation<void, FullUser>({
+      invalidatesTags: ['User'],
+      query: (body) => ({
+        body,
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        url: '/create'
+      })
+    }),
+    deleteUser: builder.mutation<void, number>({
+      invalidatesTags: ['User'],
+      query: (id) => ({
+        method: 'DELETE',
+        url: `/${id}`
+      })
+    }),
+    editUser: builder.mutation<void, EditableUser>({
+      invalidatesTags: ['User'],
+      query: ({ id, ...body }) => ({
+        body,
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT',
+        url: `/${id}`
+      })
+    }),
+    getUsers: builder.query<UserWithId[], void>({
+      providesTags: ['User'],
+      query: () => ''
+    }),
     loginUser: builder.mutation<JWTToken, User>({
       query: (body) => ({
         body,
@@ -15,7 +48,14 @@ export const userApi = createApi({
       })
     })
   }),
-  reducerPath: 'userApi'
+  reducerPath: 'userApi',
+  tagTypes: ['User']
 });
 
-export const { useLoginUserMutation } = userApi;
+export const {
+  useCreateUserMutation,
+  useDeleteUserMutation,
+  useEditUserMutation,
+  useGetUsersQuery,
+  useLoginUserMutation
+} = userApi;

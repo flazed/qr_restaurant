@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { genSalt, hash, compare } from "bcrypt";
+import { compare } from "bcrypt";
 import { check, validationResult } from "express-validator";
 
 import { pool } from "../config";
 import { User, FullUser, UserRoles } from "../types";
-import {generateUserToken} from "../utils";
+import {generatePassword, generateUserToken} from "../utils";
 
 const UserValidation = [
   check('name').exists().escape().trim().not().isEmpty().isString(),
@@ -15,6 +15,17 @@ const UserCreateValidation = [
   ...UserValidation,
   check('role').exists().not().isEmpty().isIn(Object.values(UserRoles)),
 ]
+
+const UserEditValidation = [
+  UserValidation[0],
+  check('password').optional().escape().trim().isString(),
+]
+
+const getUsers = async (_: Request, res: Response) => {
+  pool.query('SELECT id, name, role FROM users')
+    .then(data => res.status(200).json(data[0]))
+    .catch(() => res.status(500).json('Error while read users'))
+}
 
 const createUser = async (req: Request, res: Response) => {
   const errors = validationResult(req)
@@ -29,10 +40,9 @@ const createUser = async (req: Request, res: Response) => {
     const token = generateUserToken(name, role)
 
     if(token) {
-      const salt = await genSalt(10);
-      const hashPassword = await hash(password, salt);
+      const hashPassword = await generatePassword(password);
 
-      pool.query('' +
+      pool.query(
         'INSERT INTO users (name, password, role) VALUES (?, ?, ?)',
         [name, hashPassword, role]
       )
@@ -44,6 +54,54 @@ const createUser = async (req: Request, res: Response) => {
 
   } else {
     return res.status(400).json(errors)
+  }
+}
+
+const editUser = async (req: Request, res: Response) => {
+  const userID = req.params.userId
+  const errors = validationResult(req);
+
+  if(userID) {
+    const [data] = await pool.query('SELECT * FROM users WHERE id=?', [userID])
+    if(Array.isArray(data) && data.length > 0) {
+      if(errors.isEmpty()) {
+        const {
+          name,
+          password,
+          role
+        } = req.body as FullUser;
+
+        if(password.trim().length > 0) {
+          const hashPassword = await generatePassword(password)
+          pool.query('UPDATE users SET name=?, password=?, role=? WHERE id=?', [name, hashPassword, role, userID])
+            .then(() => res.status(200).json())
+            .catch(() => res.status(500).json('Error while update user with pass'))
+        } else {
+          pool.query('UPDATE users SET name=?, role=? WHERE id=?', [name, role, userID])
+            .then(() => res.status(200).json())
+            .catch(() => res.status(500).json('Error while update user'))
+        }
+      } else {
+        return res.status(400).json(errors)
+      }
+    } else {
+      return res.status(400).json(`Not found user with id: ${userID}`)
+    }
+  }
+}
+
+const deleteUser = async (req: Request, res: Response) => {
+  const userID = req.params.userId
+
+  if(userID) {
+    const [data] = await pool.query('SELECT * FROM users WHERE id=?', [userID])
+    if(Array.isArray(data) && data.length > 0) {
+      pool.query('DELETE FROM users WHERE id=?', [userID])
+        .then(() => res.status(200).json())
+        .catch(() => res.status(500).json('Error while delete user'))
+    } else {
+      return res.status(400).json(`Not found user with id: ${userID}`)
+    }
   }
 }
 
@@ -82,6 +140,10 @@ const loginUser = async (req: Request, res: Response) => {
 export {
   UserValidation,
   UserCreateValidation,
+  UserEditValidation,
+  getUsers,
   createUser,
-  loginUser
+  editUser,
+  loginUser,
+  deleteUser
 }

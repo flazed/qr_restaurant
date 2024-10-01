@@ -3,7 +3,7 @@ import { check, validationResult } from "express-validator";
 
 import { pool } from "../config";
 
-import { Product, ProductSQL, WeightType } from "../types";
+import { Product, WeightType } from "../types";
 
 const ProductValidation = [
   check('name').exists().escape().trim().not().isEmpty().isString(),
@@ -44,8 +44,57 @@ const addProduct = async (req: Request, res: Response) => {
   }
 }
 
+const editProduct = async (req: Request, res: Response) => {
+  const productId = req.params.productId
+  const errors = validationResult(req);
+
+  if(productId) {
+    const [data] = await pool.query('SELECT * FROM products WHERE id=?', [productId])
+    if(Array.isArray(data) && data.length > 0) {
+      if(errors.isEmpty()) {
+        const {
+          name,
+          weight,
+          weightType,
+          preview=  '',
+          description,
+          price,
+          inStopList
+        } = req.body as Product
+        pool.query(
+          `UPDATE products SET name=?, description=?, inStopList=?, price=?, weight=?, weightType=?, preview=? WHERE id=?`,
+          [name, description, inStopList, price, weight, weightType, preview, productId]
+        )
+          .then(() => res.status(200).json())
+          .catch((e) => res.status(400).json(e))
+      } else {
+        return res.status(400).json(errors)
+      }
+    } else {
+      return res.status(400).json(`Not found product with id: ${productId}`)
+    }
+  }
+}
+
+const deleteProduct = async (req: Request, res: Response) => {
+  const productId = req.params.productId
+
+  if(productId) {
+    const [data] = await pool.query('SELECT * FROM products WHERE id=?', [productId])
+    if(Array.isArray(data) && data.length > 0) {
+      pool.query('DELETE FROM products WHERE id=?', [productId])
+        .then(() => res.status(200).json())
+        .catch(() => res.status(500).json('Error while delete product'))
+    } else {
+      return res.status(400).json(`Not found product with id: ${productId}`)
+    }
+  }
+}
+
 export {
   ProductValidation,
   getProducts,
-  addProduct
+  addProduct,
+  editProduct,
+  deleteProduct
 }

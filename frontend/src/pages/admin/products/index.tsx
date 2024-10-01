@@ -15,7 +15,11 @@ import {
 } from '@nextui-org/react';
 
 import {
-  defaultProduct, useAddProductMutation, useGetProductsQuery
+  defaultProduct,
+  useAddProductMutation,
+  useDeleteProductMutation,
+  useEditProductMutation,
+  useGetProductsQuery
 } from '@entities/product';
 
 import { useUser } from '@shared/hooks';
@@ -28,7 +32,9 @@ import { columns } from './products.table';
 
 export const AdminProductsPage: FC = () => {
   const { data: productList = [] } = useGetProductsQuery();
-  const [addProduct, { isLoading }] = useAddProductMutation();
+  const [addProduct, { isLoading: isAddLoading }] = useAddProductMutation();
+  const [editProduct, { isLoading: isEditLoading }] = useEditProductMutation();
+  const [deleteProduct, { isLoading: isDeleteLoading }] = useDeleteProductMutation();
 
   const {
     isOpen, onClose, onOpen, onOpenChange
@@ -38,6 +44,12 @@ export const AdminProductsPage: FC = () => {
     onClose: alertOnClose,
     onOpen: alertOnOpen,
     onOpenChange: alertOnOpenChange
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteOpen,
+    onClose: deleteOnClose,
+    onOpen: deleteOnOpen,
+    onOpenChange: deleteOnOpenChange
   } = useDisclosure();
 
   const {
@@ -60,6 +72,7 @@ export const AdminProductsPage: FC = () => {
     clearErrors();
     setIsEdit(false);
     setProductPreview('');
+    setProductID(null);
     Object
       .entries(defaultProduct)
       .map(([key, value]) => setValue(key as keyof ProductWithoutID, value));
@@ -96,6 +109,16 @@ export const AdminProductsPage: FC = () => {
           alertOnOpen();
         });
     }
+
+    if (productID && isEdit) {
+      editProduct({ ...formattedData, id: productID })
+        .unwrap()
+        .then(() => setIsError(false))
+        .catch(() => setIsError(true))
+        .finally(() => {
+          alertOnOpen();
+        });
+    }
   };
 
   const handleOpenProductEditModal = (x: Product) => {
@@ -108,6 +131,24 @@ export const AdminProductsPage: FC = () => {
     if (data.preview) setProductPreview(data.preview);
     setIsEdit(true);
     onOpen();
+  };
+
+  const handleDeleteProductModal = (_productID: number) => {
+    setProductID(_productID);
+    deleteOnOpen();
+  };
+
+  const handleCloseDeleteProductModal = () => {
+    deleteOnClose();
+    setProductID(null);
+  };
+
+  const handleDeleteProduct = () => {
+    if (productID) {
+      deleteProduct(productID)
+        .unwrap()
+        .then(() => handleCloseDeleteProductModal());
+    }
   };
 
   const renderCell = (row: Product, columnKey: number | string) => {
@@ -133,7 +174,12 @@ export const AdminProductsPage: FC = () => {
           >
             <i className="far fa-edit translate-x-0.5" />
           </Button>
-          <Button color="danger" variant="flat" isIconOnly>
+          <Button
+            color="danger"
+            onClick={() => handleDeleteProductModal(row.id)}
+            variant="flat"
+            isIconOnly
+          >
             <i className="fas fa-trash-alt" />
           </Button>
         </div>
@@ -154,7 +200,7 @@ export const AdminProductsPage: FC = () => {
           <Button
             color="primary"
             endContent={<i className="fas fa-plus" />}
-            onPress={onOpen}
+            onClick={onOpen}
             variant="shadow"
           >
             Добавить блюдо
@@ -369,7 +415,7 @@ export const AdminProductsPage: FC = () => {
           <ModalFooter>
             <Button
               color="danger"
-              onPress={handleCloseProductModal}
+              onClick={handleCloseProductModal}
               variant="light"
             >
               Закрыть
@@ -377,7 +423,7 @@ export const AdminProductsPage: FC = () => {
             <Button
               color="primary"
               form="add-new-product"
-              isLoading={isLoading}
+              isLoading={isAddLoading || isEditLoading}
               type="submit"
             >
               {isEdit ? 'Редактировать' : 'Добавить'}
@@ -407,6 +453,36 @@ export const AdminProductsPage: FC = () => {
               )
             }
           </ModalBody>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={isDeleteOpen}
+        onClose={handleCloseDeleteProductModal}
+        onOpenChange={deleteOnOpenChange}
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            Удаление блюда
+          </ModalHeader>
+          <ModalBody className="text-center pb-10">
+            <span>Вы точно хотите удалить блюдо?</span>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="danger"
+              onClick={handleCloseDeleteProductModal}
+              variant="light"
+            >
+              Закрыть
+            </Button>
+            <Button
+              color="danger"
+              isLoading={isDeleteLoading}
+              onClick={handleDeleteProduct}
+            >
+              Удалить
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </>

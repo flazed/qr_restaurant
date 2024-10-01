@@ -23,7 +23,7 @@ export const UserBadge: FC = () => {
         <Button
           color="danger"
           onClick={() => dispatch(clearToken())}
-          variant="flat"
+          variant="shadow"
           isIconOnly
         >
           <i className="fas fa-sign-out-alt" />

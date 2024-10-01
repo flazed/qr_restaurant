@@ -9,7 +9,7 @@ export const pool = createPool({
   typeCast: (field, next) => {
     if (field.type === 'TINY') {
       const bytes = field.buffer();
-      return (bytes && bytes.toString() === '1') ?? false
+      return (bytes && bytes.toString() === '1')
     }
     return next()
   }

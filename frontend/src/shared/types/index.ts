@@ -2,7 +2,7 @@ export type { Product, ProductWithoutID } from './product';
 export { WeightType } from './product';
 
 export type {
-  FullUser, JWTToken, User, UserToken
+  EditableUser, FullUser, JWTToken, User, UserToken, UserWithId
 } from './user';
 export { UserRoles } from './user';
 

@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import 'dotenv/config'
 
 import { UserRoles } from "../types";
+import { genSalt, hash } from "bcrypt";
 
 export const generateUserToken = (name: string, role: UserRoles): string | null => {
   const payload = { name, role }
@@ -12,4 +13,9 @@ export const generateUserToken = (name: string, role: UserRoles): string | null 
   }
 
   return null
+}
+
+export const generatePassword = async (password: string): Promise<string> => {
+  const salt = await genSalt(10);
+  return await hash(password, salt);
 }

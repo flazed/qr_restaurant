@@ -11,6 +11,6 @@ const port = 8080;
 app.use(express.json())
 
 app.use(`${baseApiUrl}/products`, productsApi)
-app.use(`${baseApiUrl}/user`, userApi)
+app.use(`${baseApiUrl}/users`, userApi)
 
 app.listen(port, () => console.log(`Running on port ${port}`));

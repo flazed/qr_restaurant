@@ -13,6 +13,10 @@ export type FullUser = {
   role: UserRoles
 } & User;
 
+export type UserWithId = { id: number } & Omit<FullUser, 'password'>;
+
+export type EditableUser = { id: number } & FullUser;
+
 export type UserToken = JwtPayload & Pick<FullUser, 'name' | 'role'>;
 
 export enum UserRoles {

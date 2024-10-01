@@ -22,6 +22,12 @@ export const adminPaths = {
     isAdmin: true,
     path: '/admin/products',
     title: 'Продукты'
+  },
+  adminUsers: {
+    icon: 'fas fa-users',
+    isAdmin: true,
+    path: '/admin/users',
+    title: 'Пользователи'
   }
 };
 

@@ -1,6 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { AdminPage, AdminProductsPage } from '@pages/admin';
+import {
+  AdminPage, AdminProductsPage, AdminUsersPage
+} from '@pages/admin';
 import { LoginPage } from '@pages/login';
 
 import { paths } from './routes';
@@ -11,6 +13,10 @@ export const router = createBrowserRouter([
       {
         element: <AdminProductsPage />,
         path: paths.adminProducts.path
+      },
+      {
+        element: <AdminUsersPage />,
+        path: paths.adminUsers.path
       }
     ],
     element: <AdminPage />,
