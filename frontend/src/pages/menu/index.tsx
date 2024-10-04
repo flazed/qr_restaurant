@@ -4,10 +4,13 @@ import {
 } from 'react-router-dom';
 
 import {
+  Button,
   Card, CardBody, CardFooter, Chip, Image, Spinner
 } from '@nextui-org/react';
 
 import { useGetMenuSectionsListQuery, useLazyGetMenuByIdQuery } from '@entities/menu';
+
+import { ProductWeight } from '@shared/ui/product-weight';
 
 import { paths } from '@shared/router';
 
@@ -71,19 +74,33 @@ export const MenuPage: FC = () => {
                 {
                   menuSectionData.productList.map((product) => (
                     <Card key={product.id}>
-                      <CardBody className="overflow-visible p-0">
+                      <CardBody className="overflow-visible p-0 flex-grow-0">
                         <Image
                           alt={product.name}
-                          className="w-full h-[200px] object-contain"
-                          classNames={{ wrapper: 'flex items-center border-b-1 border-b-gray-200' }}
+                          className="w-full h-full object-contain p-3"
+                          classNames={{ zoomedWrapper: 'flex items-center h-[200px] border-b-1 border-b-gray-200' }}
                           radius="none"
                           src={product.preview}
                           width="100%"
+                          isZoomed
                         />
                       </CardBody>
-                      <CardFooter className="text-small justify-between">
-                        <b>{product.name}</b>
-                        <p className="text-default-500">{product.price}</p>
+                      <CardFooter className="justify-between items-start flex-col gap-5 grow-[1]">
+                        <div className="flex flex-col gap-2 mb-auto">
+                          <b className="text-sm leading-4">{product.name}</b>
+                          <p className="text-xs text-default-500">{product.description}</p>
+                        </div>
+                        <div className="flex gap-3 items-end w-full">
+                          <Button
+                            className="w-full text-amber-50 font-mono"
+                            color="success"
+                            size="sm"
+                          >
+                            <i className="fas fa-shopping-cart" />
+                            {`${product.price} ₽`}
+                          </Button>
+                          <ProductWeight type={product.weightType} weight={product.weight} />
+                        </div>
                       </CardFooter>
                     </Card>
                   ))

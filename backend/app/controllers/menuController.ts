@@ -3,6 +3,7 @@ import { check, validationResult } from "express-validator";
 
 import { pool } from "../config";
 import { MenuSectionAdmin, MenuSectionSQL } from "../types";
+import {convertFromHTMLToNormal} from "../utils";
 
 const MenuValidation = [
   check('name').exists().trim().escape().not().isEmpty().isString(),
@@ -102,16 +103,18 @@ const getMenuById = async (req: Request, res: Response) => {
       const { name, description, products } = menuData[0] as MenuSectionSQL
 
       const [productsData] = await pool.query(
-      // @ts-ignore
         `SELECT * FROM products WHERE id IN (${JSON.parse(products)})`
       )
-      console.log(products.slice(1, -1))
 
       return res.status(200).json({
-        name,
-        description,
-      // @ts-ignore
-        productList: productsData
+        name: convertFromHTMLToNormal(name),
+        description: convertFromHTMLToNormal(description),
+        // @ts-ignore
+        productList: productsData.map(x => {
+          x.name = convertFromHTMLToNormal(x.name)
+          x.description = convertFromHTMLToNormal(x.description)
+          return x
+        })
       })
     } else {
       return res.status(400).json(`Not found menu with id: ${menuId}`)

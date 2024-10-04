@@ -13,7 +13,7 @@ import {
 const router = Router()
 
 router.get('/', getMenuList)
-router.get('/:menuId', getMenuById)
+router.get('/section/:menuId', getMenuById)
 router.get('/admin', authUser, isAdmin, getMenuAdmin)
 router.post('/', authUser, isAdmin, MenuValidation, addMenu)
 router.put('/:menuId', authUser, isAdmin, MenuValidation, editMenu)

@@ -39,7 +39,7 @@ export const menuApi = createApi({
       providesTags: ['Menu'],
       query: () => '/admin'
     }),
-    getMenuById: builder.query<MenuSection, number>({ query: (id) => `/${id}` }),
+    getMenuById: builder.query<MenuSection, number>({ query: (id) => `/section/${id}` }),
     getMenuSectionsList: builder.query<MenuSectionItem[], void>({ query: () => '/' })
   }),
   reducerPath: 'menuApi',
