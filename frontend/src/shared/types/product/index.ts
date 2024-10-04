@@ -11,7 +11,7 @@ export type Product = {
 
 export enum WeightType {
   Gramm = 1,
-  Milligramm = 2
+  Milliliter = 2
 }
 
 export type ProductWithoutID = Omit<Product, 'id'>;

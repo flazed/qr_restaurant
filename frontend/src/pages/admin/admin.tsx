@@ -49,8 +49,8 @@ export const AdminPage: FC = () => {
         </NavbarBrand>
         <UserBadge />
       </Navbar>
-      <div className="flex">
-        <div className="bg-gray-900 text-amber-50 h-[calc(100vh_-_64px)] w-[200px]">
+      <div className="flex relative">
+        <div className="bg-gray-900 text-amber-50 min-h-[calc(100vh_-_64px)] w-[200px] fixed top-[64px]">
           <div className="flex flex-col p-3 gap-2">
             {Object.values(adminPaths)
               .filter((x) => x.isAdmin === isAdmin() || !x.isAdmin)
@@ -69,7 +69,7 @@ export const AdminPage: FC = () => {
               ))}
           </div>
         </div>
-        <div className="p-10 grow-[1]">
+        <div className="p-10 grow-[1] ml-[200px]">
           <Outlet />
         </div>
       </div>

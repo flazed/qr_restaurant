@@ -1,3 +1,7 @@
+export type {
+  MenuSection, MenuSectionAdmin, MenuSectionItem
+} from './menu';
+
 export type { Product, ProductWithoutID } from './product';
 export { WeightType } from './product';
 
@@ -6,4 +10,4 @@ export type {
 } from './user';
 export { UserRoles } from './user';
 
-export type GUID = { isGuid: true } & string;
+export type HasId = { id: number };

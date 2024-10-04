@@ -36,5 +36,9 @@ export const paths = {
     path: '/login',
     title: 'Логин'
   },
+  menu: {
+    path: '/menu',
+    title: 'menu'
+  },
   ...adminPaths
 };

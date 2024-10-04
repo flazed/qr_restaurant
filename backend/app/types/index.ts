@@ -4,4 +4,6 @@ export { WeightType } from './product';
 export type { FullUser, User, UserToken } from './user'
 export { UserRoles } from './user'
 
-export type GUID = { isGuid: true } & string;
+export type { MenuSectionAdmin, MenuSection } from './menu'
+
+export type HasId = { id: number }

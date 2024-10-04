@@ -15,5 +15,5 @@ export type ProductSQL = Omit<Product, 'inStopList'> & {
 
 export enum WeightType {
   Gramm = 1,
-  Milligramm = 2
+  Milliliter = 2
 }

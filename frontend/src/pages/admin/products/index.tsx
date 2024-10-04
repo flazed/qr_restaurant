@@ -1,5 +1,5 @@
 import {
-  FC, useEffect, useState
+  FC, useEffect, useMemo, useState
 } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -7,11 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import {
   Button, Chip, Image, Input,
   Modal, ModalBody, ModalContent,
-  ModalFooter, ModalHeader, Select,
-  SelectItem, Table, TableBody,
-  TableCell, TableColumn, TableHeader,
-  TableRow, Textarea, getKeyValue,
-  useDisclosure
+  ModalFooter, ModalHeader, Pagination,
+  Select, SelectItem, Table,
+  TableBody, TableCell, TableColumn,
+  TableHeader, TableRow, Textarea,
+  getKeyValue, useDisclosure
 } from '@nextui-org/react';
 
 import {
@@ -29,6 +29,8 @@ import {
 } from '@shared/types';
 
 import { columns } from './products.table';
+
+const rowsPerPage = 10;
 
 export const AdminProductsPage: FC = () => {
   const { data: productList = [] } = useGetProductsQuery();
@@ -64,8 +66,14 @@ export const AdminProductsPage: FC = () => {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [productPreview, setProductPreview] = useState<string>('');
+  const [search, setSearch] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
   const { isAdmin } = useUser();
   const navigate = useNavigate();
+
+  const pages = Math.ceil(productList
+    .filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+    .length / rowsPerPage);
 
   const handleCloseProductModal = () => {
     onClose();
@@ -101,6 +109,18 @@ export const AdminProductsPage: FC = () => {
     }
 
     if (!isEdit) {
+      // for (const x of JSON.parse(xData)) {
+      //   const xForm = {
+      //     description: x.description,
+      //     inStopList: false,
+      //     name: x.name,
+      //     preview: x.image,
+      //     price: Number(x.price),
+      //     weight: 750,
+      //     weightType: 2
+      //   };
+      //   addProduct(xForm);
+      // }
       addProduct(formattedData)
         .unwrap()
         .then(() => setIsError(false))
@@ -186,8 +206,39 @@ export const AdminProductsPage: FC = () => {
       );
     }
 
+    if (columnKey === 'description') {
+      if (row.description.length > 110) {
+        return `${row.description.slice(0, 110)}...`;
+      }
+      return row.description;
+    }
+
     return getKeyValue(row, columnKey);
   };
+
+  const topContent = useMemo(() => (
+    <div className="flex justify-start w-1/6">
+      <Input
+        label="Поиск"
+        onValueChange={setSearch}
+        placeholder="Введите название блюда"
+        value={search}
+      />
+    </div>
+  ), [search]);
+
+  const bottomContent = useMemo(() => (
+    <div className="flex justify-center">
+      <Pagination
+        color="primary"
+        onChange={setPage}
+        page={page}
+        total={pages}
+        showControls
+        showShadow
+      />
+    </div>
+  ), [page, productList.length, pages]);
 
   useEffect(() => {
     if (!isAdmin()) navigate(paths.adminMain.path);
@@ -206,7 +257,11 @@ export const AdminProductsPage: FC = () => {
             Добавить блюдо
           </Button>
         </div>
-        <Table aria-label="products table">
+        <Table
+          aria-label="products table"
+          bottomContent={bottomContent}
+          topContent={topContent}
+        >
           <TableHeader>
             {columns.map((column) => (
               <TableColumn key={column.key}>
@@ -215,15 +270,18 @@ export const AdminProductsPage: FC = () => {
             ))}
           </TableHeader>
           <TableBody emptyContent="Пока блюд нет">
-            {productList.map((x) => (
-              <TableRow key={x.id}>
-                {(columnKey) => (
-                  <TableCell>
-                    {renderCell(x, columnKey)}
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
+            {productList
+              .filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
+              .slice(rowsPerPage * (page - 1), rowsPerPage * (page - 1) + rowsPerPage)
+              .map((x) => (
+                <TableRow key={x.id}>
+                  {(columnKey) => (
+                    <TableCell>
+                      {renderCell(x, columnKey)}
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </div>
@@ -323,8 +381,8 @@ export const AdminProductsPage: FC = () => {
                           <SelectItem key={WeightType.Gramm}>
                             грамм
                           </SelectItem>
-                          <SelectItem key={WeightType.Milligramm}>
-                            миллиграмм
+                          <SelectItem key={WeightType.Milliliter}>
+                            миллилитров
                           </SelectItem>
                         </Select>
                       )}

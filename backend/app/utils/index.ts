@@ -19,3 +19,9 @@ export const generatePassword = async (password: string): Promise<string> => {
   const salt = await genSalt(10);
   return await hash(password, salt);
 }
+
+export const convertFromHTMLToNormal = (x: string): string => {
+  return x
+    .replace(/&quot;/g, '\"')
+    .replace(/&#x2F;/g, '/')
+}

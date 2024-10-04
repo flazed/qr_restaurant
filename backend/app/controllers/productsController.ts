@@ -3,7 +3,8 @@ import { check, validationResult } from "express-validator";
 
 import { pool } from "../config";
 
-import { Product, WeightType } from "../types";
+import { HasId, Product, WeightType } from "../types";
+import { convertFromHTMLToNormal } from "../utils";
 
 const ProductValidation = [
   check('name').exists().escape().trim().not().isEmpty().isString(),
@@ -17,7 +18,14 @@ const ProductValidation = [
 
 const getProducts = async (_: Request, res: Response) => {
   pool.query('SELECT * FROM products')
-    .then((data) => res.json(data[0]))
+    .then((data) => {
+      // @ts-ignore
+      res.json(data[0].map(x => {
+        x.name = convertFromHTMLToNormal(x.name)
+        x.description = convertFromHTMLToNormal(x.description)
+        return x
+      }))
+    })
 }
 
 const addProduct = async (req: Request, res: Response) => {
@@ -82,6 +90,18 @@ const deleteProduct = async (req: Request, res: Response) => {
   if(productId) {
     const [data] = await pool.query('SELECT * FROM products WHERE id=?', [productId])
     if(Array.isArray(data) && data.length > 0) {
+      const menuIdsWithProduct: (HasId & { products: number[] })[] = await pool.query(`SELECT id, products FROM menu WHERE JSON_CONTAINS(products, ?, '$') > 0`, [productId])
+        // @ts-ignore
+        .then((data) => data[0].map(x => {
+          x.products = JSON.parse(x.products)
+          return x
+        }))
+      for(const {id, products} of menuIdsWithProduct) {
+        await pool.query(
+          'UPDATE menu SET products=? WHERE id=?',
+          [JSON.stringify(products.filter(x => x !== Number(productId))), id]
+        )
+      }
       pool.query('DELETE FROM products WHERE id=?', [productId])
         .then(() => res.status(200).json())
         .catch(() => res.status(500).json('Error while delete product'))
