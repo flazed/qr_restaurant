@@ -36,6 +36,10 @@ export const router = createBrowserRouter([
   },
   {
     element: <MenuPage />,
+    path: paths.menu.path
+  },
+  {
+    element: <MenuPage />,
     path: `${paths.menu.path}/:menuId`
   }
 ]);

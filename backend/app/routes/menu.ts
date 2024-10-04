@@ -5,6 +5,7 @@ import {
   deleteMenu,
   editMenu,
   getMenuAdmin,
+  getMenuById,
   getMenuList,
   MenuValidation
 } from "../controllers/menuController";
@@ -12,6 +13,7 @@ import {
 const router = Router()
 
 router.get('/', getMenuList)
+router.get('/:menuId', getMenuById)
 router.get('/admin', authUser, isAdmin, getMenuAdmin)
 router.post('/', authUser, isAdmin, MenuValidation, addMenu)
 router.put('/:menuId', authUser, isAdmin, MenuValidation, editMenu)

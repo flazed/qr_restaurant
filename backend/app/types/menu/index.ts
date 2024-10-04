@@ -1,13 +1,12 @@
-import { Product } from '@shared/types';
-
-export type MenuSectionAdmin = {
+type MenuSectionBase = {
   description: string
   name: string,
+}
+
+export type MenuSectionAdmin = MenuSectionBase & {
   productList: number[]
 };
 
-export type MenuSection = {
-  description: string
-  name: string,
-  productList: Product[]
+export type MenuSectionSQL = MenuSectionBase & {
+  products: string
 };

@@ -1,8 +1,8 @@
-import {json, Request, Response} from "express";
+import { Request, Response} from "express";
 import { check, validationResult } from "express-validator";
 
 import { pool } from "../config";
-import { HasId, MenuSectionAdmin } from "../types";
+import { MenuSectionAdmin, MenuSectionSQL } from "../types";
 
 const MenuValidation = [
   check('name').exists().trim().escape().not().isEmpty().isString(),
@@ -92,11 +92,39 @@ const deleteMenu = async (req: Request, res: Response) => {
   }
 }
 
+const getMenuById = async (req: Request, res: Response) => {
+  const menuId = req.params.menuId
+
+  if(menuId) {
+    const [menuData] = await pool.query('SELECT * FROM menu WHERE id=?', [menuId])
+
+    if(Array.isArray(menuData) && menuData.length > 0) {
+      const { name, description, products } = menuData[0] as MenuSectionSQL
+
+      const [productsData] = await pool.query(
+      // @ts-ignore
+        `SELECT * FROM products WHERE id IN (${JSON.parse(products)})`
+      )
+      console.log(products.slice(1, -1))
+
+      return res.status(200).json({
+        name,
+        description,
+      // @ts-ignore
+        productList: productsData
+      })
+    } else {
+      return res.status(400).json(`Not found menu with id: ${menuId}`)
+    }
+  }
+}
+
 export {
   MenuValidation,
   getMenuAdmin,
   addMenu,
   editMenu,
   deleteMenu,
-  getMenuList
+  getMenuList,
+  getMenuById
 }

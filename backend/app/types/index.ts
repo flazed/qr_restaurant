@@ -4,6 +4,6 @@ export { WeightType } from './product';
 export type { FullUser, User, UserToken } from './user'
 export { UserRoles } from './user'
 
-export type { MenuSectionAdmin, MenuSection } from './menu'
+export type { MenuSectionAdmin, MenuSectionSQL } from './menu'
 
 export type HasId = { id: number }

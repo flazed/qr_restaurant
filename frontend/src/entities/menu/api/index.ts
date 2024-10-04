@@ -2,7 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 
 import { BaseQueryWithAuth } from '@shared/api';
 import {
-  HasId,
+  HasId, MenuSection,
   MenuSectionAdmin,
   MenuSectionItem
 } from '@shared/types';
@@ -39,6 +39,7 @@ export const menuApi = createApi({
       providesTags: ['Menu'],
       query: () => '/admin'
     }),
+    getMenuById: builder.query<MenuSection, number>({ query: (id) => `/${id}` }),
     getMenuSectionsList: builder.query<MenuSectionItem[], void>({ query: () => '/' })
   }),
   reducerPath: 'menuApi',
@@ -50,5 +51,6 @@ export const {
   useDeleteMenuMutation,
   useEditMenuMutation,
   useGetAdminMenuQuery,
-  useGetMenuSectionsListQuery
+  useGetMenuSectionsListQuery,
+  useLazyGetMenuByIdQuery
 } = menuApi;
