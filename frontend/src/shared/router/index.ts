@@ -1,2 +1,4 @@
 export { router } from './router';
-export { adminPaths, paths } from './routes';
+export {
+  adminPaths, paths, userPaths
+} from './routes';

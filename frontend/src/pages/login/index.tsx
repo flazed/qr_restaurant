@@ -74,6 +74,7 @@ export const LoginPage: FC = () => {
               label="Логин"
               onValueChange={(x) => handleChangeUserField('name', x)}
               placeholder="Введите логин"
+              autoFocus
               isRequired
             />
             <Input
@@ -103,7 +104,7 @@ export const LoginPage: FC = () => {
               className="w-[70%] mx-auto"
               color="primary"
               isLoading={isLoading}
-              onClick={handleLoginUser}
+              onPress={handleLoginUser}
             >
               Войти
             </Button>

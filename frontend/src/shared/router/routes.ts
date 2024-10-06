@@ -31,14 +31,35 @@ export const adminPaths = {
   }
 };
 
+const sigUserPaths = {
+  main: {
+    icon: 'fas fa-home',
+    path: '/',
+    title: 'Главная'
+  },
+  menu: {
+    icon: 'fas fa-pizza-slice',
+    path: '/menu',
+    title: 'Меню'
+  },
+  cart: {
+    icon: 'fas fa-shopping-cart',
+    path: '/cart',
+    title: 'Корзина'
+  },
+  order: {
+    icon: 'fas fa-wallet',
+    path: '/order',
+    title: 'Оплата заказа'
+  }
+};
+export const userPaths = sigUserPaths;
+
 export const paths = {
   login: {
     path: '/login',
     title: 'Логин'
   },
-  menu: {
-    path: '/menu',
-    title: 'menu'
-  },
-  ...adminPaths
+  ...adminPaths,
+  ...userPaths
 };
