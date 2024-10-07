@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import {
   AdminMenuPage,
+  AdminOrdersPage,
   AdminPage,
   AdminProductsPage,
   AdminUsersPage
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
       {
         element: <AdminMenuPage />,
         path: paths.adminMenu.path
+      },
+      {
+        element: <AdminOrdersPage />,
+        path: paths.adminOrders.path
       }
     ],
     element: <AdminPage />,

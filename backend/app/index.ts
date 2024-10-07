@@ -1,6 +1,6 @@
 import express from 'express'
 import {
-  menuApi,
+  menuApi, ordersApi,
   productsApi,
   userApi
 } from "./routes";
@@ -14,5 +14,6 @@ app.use(express.json())
 app.use(`${baseApiUrl}/products`, productsApi)
 app.use(`${baseApiUrl}/users`, userApi)
 app.use(`${baseApiUrl}/menu`, menuApi)
+app.use(`${baseApiUrl}/orders`, ordersApi)
 
 app.listen(port, () => console.log(`Running on port ${port}`));

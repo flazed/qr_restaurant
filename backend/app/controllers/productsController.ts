@@ -20,7 +20,7 @@ const getProducts = async (_: Request, res: Response) => {
   pool.query('SELECT * FROM products')
     .then((data) => {
       // @ts-ignore
-      res.json(data[0].map(x => {
+      return res.json(data[0].map(x => {
         x.name = convertFromHTMLToNormal(x.name)
         x.description = convertFromHTMLToNormal(x.description)
         return x

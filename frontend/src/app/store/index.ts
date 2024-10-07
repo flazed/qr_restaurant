@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { menuApi } from '@entities/menu';
+import { ordersApi } from '@entities/order';
 import { productApi, productSlice } from '@entities/product';
 import { userApi, userSlice } from '@entities/user';
 
@@ -10,9 +11,11 @@ export const store = configureStore({
       .concat(productApi.middleware)
       .concat(userApi.middleware)
       .concat(menuApi.middleware)
+      .concat(ordersApi.middleware)
   ),
   reducer: {
     [menuApi.reducerPath]: menuApi.reducer,
+    [ordersApi.reducerPath]: ordersApi.reducer,
     [productApi.reducerPath]: productApi.reducer,
     [productSlice.name]: productSlice.reducer,
     [userApi.reducerPath]: userApi.reducer,

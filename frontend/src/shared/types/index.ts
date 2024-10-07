@@ -2,6 +2,9 @@ export type {
   MenuSection, MenuSectionAdmin, MenuSectionItem
 } from './menu';
 
+export type { Order } from './order';
+export { OrderType, Statuses } from './order';
+
 export type { Product, ProductWithoutID } from './product';
 export { WeightType } from './product';
 

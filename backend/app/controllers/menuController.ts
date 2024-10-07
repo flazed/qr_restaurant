@@ -1,9 +1,9 @@
-import { Request, Response} from "express";
+import { Request, Response } from "express";
 import { check, validationResult } from "express-validator";
 
 import { pool } from "../config";
 import { MenuSectionAdmin, MenuSectionSQL } from "../types";
-import {convertFromHTMLToNormal} from "../utils";
+import { convertFromHTMLToNormal } from "../utils";
 
 const MenuValidation = [
   check('name').exists().trim().escape().not().isEmpty().isString(),
@@ -46,7 +46,7 @@ const addMenu = async (req: Request, res: Response) => {
       .then(() => res.status(200).json())
       .catch(() => res.status(500).json('Error while add menu section'))
   } else {
-    res.status(400).json(errors)
+    return res.status(400).json(errors)
   }
 }
 
