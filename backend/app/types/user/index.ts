@@ -10,6 +10,7 @@ export type FullUser = User & {
 }
 
 export type UserToken = {
+  id: number
   name: string
   role: UserRoles
 } & JwtPayload

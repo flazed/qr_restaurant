@@ -4,8 +4,8 @@ import 'dotenv/config'
 import { UserRoles } from "../types";
 import { genSalt, hash } from "bcrypt";
 
-export const generateUserToken = (name: string, role: UserRoles): string | null => {
-  const payload = { name, role }
+export const generateUserToken = (id: number, name: string, role: UserRoles): string | null => {
+  const payload = { id, name, role }
   const tokenSecret = process.env.TOKEN_SECRET
 
   if(tokenSecret) {

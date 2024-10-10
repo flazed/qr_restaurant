@@ -6,6 +6,7 @@ export type Order = {
   totalPrice: number
   tips: number
   waiter_id: number | null
+  name: string | null
   orderTable: number | null
   status: Statuses
 }

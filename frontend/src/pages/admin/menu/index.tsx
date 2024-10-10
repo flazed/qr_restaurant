@@ -5,13 +5,15 @@ import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import {
-  Button, Checkbox, CheckboxGroup, Input,
+  Button, Input,
   Modal, ModalBody, ModalContent,
   ModalFooter, ModalHeader,
   Table, TableBody, TableCell,
   TableColumn, TableHeader, TableRow,
   Textarea, getKeyValue, useDisclosure
 } from '@nextui-org/react';
+
+import { ProductList } from '@widgets/product-list';
 
 import {
   useAddMenuMutation, useDeleteMenuMutation, useEditMenuMutation, useGetAdminMenuQuery
@@ -59,7 +61,6 @@ export const AdminMenuPage: FC = () => {
   const { isAdmin } = useUser();
   const [menuID, setMenuID] = useState<null | number>(null);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [search, setSearch] = useState<string>('');
 
   const handleCloseMenuModal = () => {
     onClose();
@@ -237,39 +238,11 @@ export const AdminMenuPage: FC = () => {
               <div>
                 <Controller
                   render={({ field: { onChange, value } }) => (
-                    <div className="flex flex-col gap-3">
-                      <span className="text-medium">Блюда в разделе</span>
-                      <Input
-                        label="Поиск"
-                        onValueChange={setSearch}
-                        placeholder="Введите название блюда"
-                        value={search}
-                      />
-                      <CheckboxGroup
-                        className="h-[350px] overflow-y-scroll bg-default-100 py-2 px-3 rounded-medium"
-                        onValueChange={(newValue) => onChange(newValue.map((x) => Number(x)))}
-                        value={value.map((x) => String(x))}
-                      >
-                        {productList
-                          .filter((x) => x.name.toLowerCase().includes(search.toLowerCase()))
-                          .map((product) => (
-                            <Checkbox
-                              key={product.id}
-                              value={String(product.id)}
-                            >
-                              {product.name}
-                              {' '}
-                              <b>
-                                (
-                                {product.price}
-                                {' '}
-                                <i className="fas fa-ruble-sign" />
-                                )
-                              </b>
-                            </Checkbox>
-                          ))}
-                      </CheckboxGroup>
-                    </div>
+                    <ProductList
+                      error={errors.productList?.message}
+                      onChange={onChange}
+                      value={value}
+                    />
                   )}
                   control={control}
                   name="productList"
