@@ -34,6 +34,14 @@ export const productApi = createApi({
     getProducts: builder.query<Product[], void>({
       providesTags: ['Product'],
       query: () => ''
+    }),
+    getProductsByIDs: builder.mutation<Product[], number[]>({
+      query: (products) => ({
+        body: { products },
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        url: '/products'
+      })
     })
   }),
   reducerPath: 'productApi',
@@ -44,5 +52,6 @@ export const {
   useAddProductMutation,
   useDeleteProductMutation,
   useEditProductMutation,
+  useGetProductsByIDsMutation,
   useGetProductsQuery
 } = productApi;

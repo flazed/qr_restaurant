@@ -50,7 +50,7 @@ const sigUserPaths = {
   order: {
     icon: 'fas fa-wallet',
     path: '/order',
-    title: 'Оплата заказа'
+    title: 'Оплата стола'
   }
 };
 export const userPaths = sigUserPaths;

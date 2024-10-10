@@ -17,6 +17,14 @@ export const ordersApi = createApi({
         url: '/admin'
       })
     }),
+    createUserOrder: builder.mutation<HasId, number[]>({
+      query: (products) => ({
+        body: { products },
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        url: '/'
+      })
+    }),
     editOrder: builder.mutation<void, HasId & NewWaiterOrder>({
       invalidatesTags: ['Order'],
       query: ({ id, ...body }) => ({
@@ -46,6 +54,7 @@ export const ordersApi = createApi({
 
 export const {
   useAddAdminOrderMutation,
+  useCreateUserOrderMutation,
   useEditOrderMutation,
   useEditOrderStatusMutation,
   useGetOrdersQuery

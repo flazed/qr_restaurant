@@ -12,6 +12,7 @@ import { useGetMenuSectionsListQuery, useLazyGetMenuByIdQuery } from '@entities/
 
 import { ProductWeight } from '@shared/ui/product-weight';
 
+import { useProduct } from '@shared/hooks';
 import { paths } from '@shared/router';
 
 export const MenuPage: FC = () => {
@@ -24,11 +25,19 @@ export const MenuPage: FC = () => {
 
   const { menuId } = useParams();
   const navigate = useNavigate();
+  const {
+    addProduct, cart, removeProduct
+  } = useProduct();
 
   useEffect(() => {
     if (menuSectionList.length > 0) {
       if (
-        !menuId || (menuId && !menuSectionList.find((x) => String(x.id) === menuId))
+        !menuId
+        || (
+          menuId
+          && !menuSectionList
+            .find((x) => String(x.id) === menuId)
+        )
       ) {
         navigate(`${paths.menu.path}/${menuSectionList[0].id}`);
       } else {
@@ -38,7 +47,7 @@ export const MenuPage: FC = () => {
   }, [menuId, menuSectionList.length]);
 
   return (
-    <div className="flex flex-col min-h-[100vh]">
+    <div className="flex flex-col min-h-[100vh] w-full">
       <div className="p-3 text-amber-50 flex gap-1.5 flex-wrap">
         {menuSectionList.map((x) => (
           <NavLink
@@ -46,7 +55,7 @@ export const MenuPage: FC = () => {
             to={`${paths.menu.path}/${String(x.id)}`}
           >
             <Chip
-              color={x.id === Number(menuId) ? 'primary' : 'danger'}
+              color={x.id === Number(menuId) ? 'primary' : 'default'}
               variant="shadow"
             >
               {x.name}
@@ -91,14 +100,29 @@ export const MenuPage: FC = () => {
                           <p className="text-xs text-default-500">{product.description}</p>
                         </div>
                         <div className="flex gap-3 items-end w-full">
-                          <Button
-                            className="w-full text-amber-50 font-mono"
-                            color="success"
-                            size="sm"
-                          >
-                            <i className="fas fa-shopping-cart" />
-                            {`${product.price} ₽`}
-                          </Button>
+                          {
+                            cart.includes(product.id) ? (
+                              <Button
+                                className="w-full text-amber-50 font-mono"
+                                color="danger"
+                                onPress={() => removeProduct(product.id)}
+                                size="sm"
+                              >
+                                <i className="fas fa-trash-alt" />
+                                Убрать
+                              </Button>
+                            ) : (
+                              <Button
+                                className="w-full text-amber-50 font-mono"
+                                color="success"
+                                onPress={() => addProduct(product.id)}
+                                size="sm"
+                              >
+                                <i className="fas fa-shopping-cart" />
+                                {`${product.price} ₽`}
+                              </Button>
+                            )
+                          }
                           <ProductWeight type={product.weightType} weight={product.weight} />
                         </div>
                       </CardFooter>

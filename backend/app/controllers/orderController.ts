@@ -9,7 +9,7 @@ import {
   OrderType, Product, Statuses,
   UserRoles, UserToken
 } from "../types";
-import { convertFromHTMLToNormal } from "../utils";
+import {convertFromHTMLToNormal, getDateForDB} from "../utils";
 
 const tokenSecret = process.env.TOKEN_SECRET
 
@@ -81,7 +81,6 @@ const getOrders = async (req: Request, res: Response) => {
 
 const createUserOrder = async (req: Request, res: Response) => {
   const { products } = req.body as Pick<Order, 'products'>
-  const date = new Date().toJSON();
 
   const totalPrice = await pool.query(`SELECT * FROM products WHERE id IN (${products})`)
     .then(([productsFromDB]) => {
@@ -95,9 +94,10 @@ const createUserOrder = async (req: Request, res: Response) => {
   pool.query(
     `INSERT INTO orders (date, orderType, products, totalPrice, tips, status)
     VALUES (?, ?, ?, ?, ?, ?)`,
-    [date, OrderType.Self, JSON.stringify(products), totalPrice, 0, Statuses.Created]
+    [getDateForDB(), OrderType.Self, JSON.stringify(products), totalPrice, 0, Statuses.Completed]
   )
-    .then(() => res.status(200).json())
+    // @ts-ignore
+    .then((x) => res.status(200).json({ id: x[0].insertId }))
     .catch((e) => res.status(500).json(e))
 }
 
@@ -118,11 +118,6 @@ const createWaiterOrder = async (req: Request, res: Response) => {
   if(isOrderCreatedOnThisTable) {
     return res.status(400).json('Order on this table is already exist')
   }
-
-  const date = new Date().toISOString();
-  const dateDate = date.split('T')[0]
-  const dateTime = date.split('T')[1].slice(0, -2)
-  const finalDate = `${dateDate} ${dateTime}`
 
   const isWaiterExist = await pool.query('SELECT * FROM users WHERE id=?', [id])
     .then(([waitersList]) => {
@@ -155,7 +150,7 @@ const createWaiterOrder = async (req: Request, res: Response) => {
     pool.query(
       `INSERT INTO orders (date, orderType, products, totalPrice, tips, waiter_id, orderTable, status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [finalDate, OrderType.Hall, JSON.stringify(products), totalPrice, 0, id, orderTable, Statuses.Created]
+      [getDateForDB(), OrderType.Hall, JSON.stringify(products), totalPrice, 0, id, orderTable, Statuses.Created]
     )
       .then(() => res.status(200).json())
       .catch((e) => res.status(500).json(e))

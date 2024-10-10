@@ -111,10 +111,32 @@ const deleteProduct = async (req: Request, res: Response) => {
   }
 }
 
+const getProductsByIDs = async (req: Request, res: Response) => {
+  const { products } = req.body as { products: Product[] }
+
+  const [productsFromDB] = await pool.query(`SELECT * FROM products WHERE id IN (${products})`)
+
+  if (
+    Array.isArray(productsFromDB)
+    && productsFromDB.length > 0
+  ) {
+    return res
+      .status(200)
+      .json((productsFromDB as Product[]).map(x => {
+        x.name = convertFromHTMLToNormal(x.name)
+        x.description = convertFromHTMLToNormal(x.description)
+        return x
+      }))
+  } else {
+    return res.status(400).json()
+  }
+}
+
 export {
   ProductValidation,
   getProducts,
   addProduct,
   editProduct,
-  deleteProduct
+  deleteProduct,
+  getProductsByIDs
 }

@@ -18,7 +18,7 @@ export const IndexLayout: FC = () => {
   };
 
   return (
-    <div className="min-h-[100vh] pb-[68px] flex">
+    <div className="min-h-[100vh] pb-[68px] flex w-full">
       <Outlet />
       <div className="fixed w-full bottom-0 bg-neutral-800 grid grid-cols-4 gap-1 z-20">
         {Object.values(userPaths).map((x) => (
