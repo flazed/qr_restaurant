@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { userPaths } from '@shared/router';
 
 export const MainPage: FC = () => (
-  <div className="grow-[1] flex items-center justify-center bg-neutral-700">
+  <div className="flex-grow flex items-center justify-center bg-neutral-700">
     <div className="flex flex-col gap-5 w-10/12">
       <div className="flex flex-col justify-center items-center text-white font-sacramento">
         <span className="text-8xl">la Vita</span>

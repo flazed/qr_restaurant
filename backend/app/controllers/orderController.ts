@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
-import { check } from "express-validator";
+import {check, validationResult} from "express-validator";
 
 import { pool } from "../config";
 
@@ -10,6 +10,7 @@ import {
   UserRoles, UserToken
 } from "../types";
 import {convertFromHTMLToNormal, getDateForDB} from "../utils";
+import {exists} from "fs";
 
 const tokenSecret = process.env.TOKEN_SECRET
 
@@ -20,6 +21,10 @@ const BaseOrderValidation = [
 const WaiterOrderValidation = [
   ...BaseOrderValidation,
   check('orderTable').exists().isInt().not().isString(),
+]
+
+const UserPayOrderValidation = [
+  check('tips').exists().not().isEmpty().isInt({min: 0}).not().isString(),
 ]
 
 const ValidNewStatuses = Object
@@ -239,17 +244,83 @@ const changeOrderStatus = async (req: Request, res: Response) => {
           return res.status(400).json('Invalid status to update')
         }
       } else {
-        return res.status(400).json('Order with status Created must be one')
+        return res.status(400).json('Not found order with Created status')
       }
     })
+}
+
+const getOrderByTable = async (req: Request, res: Response) => {
+  const tableId = req.params.tableId
+
+  if(tableId) {
+    const [ordersList] = await pool.query(
+      'SELECT o.*, u.name FROM orders o LEFT JOIN users u on o.waiter_id = u.id WHERE orderTable=? AND status=?',
+      [tableId, Statuses.Created]
+    )
+
+    if(Array.isArray(ordersList) && ordersList.length === 1) {
+      const { products, waiter_id, ...order } = ordersList[0] as Order
+
+      const [productsData] = await pool.query(
+        // @ts-ignore
+        `SELECT * FROM products WHERE id IN (${JSON.parse(products)})`
+      )
+
+      return res.status(200).json(({
+        ...order,
+        date: `${order.date.toLocaleString()}Z`,
+        // @ts-ignore
+        products: productsData.map(x => {
+          x.name = convertFromHTMLToNormal(x.name)
+          x.description = convertFromHTMLToNormal(x.description)
+          return x
+        })
+      }))
+    } else {
+      return res.status(400).json('Invalid get order data')
+    }
+  } else {
+    return res.status(400).json('Table not found')
+  }
+}
+
+const payUserOrder  = async (req: Request, res: Response) => {
+  const errors = validationResult(req)
+
+  if(errors.isEmpty()) {
+    const orderId = req.params.orderId
+    const { tips } = req.body
+
+    pool.query('SELECT * FROM orders WHERE id=? AND status=?', [orderId, Statuses.Created])
+      .then(([ordersList]) => {
+        console.log(ordersList)
+        if (Array.isArray(ordersList) && ordersList.length === 1) {
+          const { totalPrice } = ordersList[0] as Order
+
+          pool.query(
+            'UPDATE orders SET totalPrice=?, tips=?, status=? WHERE id=?',
+            [totalPrice + tips, tips, Statuses.Completed, orderId]
+          )
+            .then(() => res.status(200).json())
+            .catch((e) => res.status(500).json(e))
+        } else {
+          return res.status(400).json('Not found order with Created status')
+        }
+      })
+  } else {
+   return res.status(400).json(errors)
+  }
 }
 
 export {
   BaseOrderValidation,
   WaiterOrderValidation,
+  UserPayOrderValidation,
   getOrders,
   createUserOrder,
   editWaiterOrder,
   createWaiterOrder,
   changeOrderStatus,
+  getOrderByTable,
+  payUserOrder
 }

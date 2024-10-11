@@ -329,7 +329,7 @@ export const AdminProductsPage: FC = () => {
                         classNames={{
                           base: 'h-full',
                           input: 'h-full',
-                          inputWrapper: 'grow-[1]'
+                          inputWrapper: 'flex-grow'
                         }}
                         errorMessage={errors.description?.message}
                         isInvalid={Boolean(errors.description?.message)}

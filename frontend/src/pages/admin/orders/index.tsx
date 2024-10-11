@@ -172,6 +172,9 @@ export const AdminOrdersPage: FC = () => {
     }
 
     if (columnKey === 'totalPrice') {
+      if (row.tips) {
+        return `${row.totalPrice}  ₽ (${row.tips} ₽)`;
+      }
       return `${row.totalPrice}  ₽`;
     }
 

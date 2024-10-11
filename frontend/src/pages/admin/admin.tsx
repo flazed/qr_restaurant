@@ -69,7 +69,7 @@ export const AdminPage: FC = () => {
               ))}
           </div>
         </div>
-        <div className="p-10 grow-[1] ml-[200px]">
+        <div className="p-10 flex-grow ml-[200px]">
           <Outlet />
         </div>
       </div>

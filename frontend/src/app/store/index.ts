@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import { cartSlice } from '@entities/cart';
 import { menuApi } from '@entities/menu';
 import { ordersApi } from '@entities/order';
 import { productApi, productSlice } from '@entities/product';
@@ -16,6 +17,7 @@ export const store = configureStore({
       .concat(tablesApi.middleware)
   ),
   reducer: {
+    [cartSlice.name]: cartSlice.reducer,
     [menuApi.reducerPath]: menuApi.reducer,
     [ordersApi.reducerPath]: ordersApi.reducer,
     [productApi.reducerPath]: productApi.reducer,

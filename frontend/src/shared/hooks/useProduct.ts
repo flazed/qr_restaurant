@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+
+import { handleSetCart } from '@entities/cart';
 
 import { useLocalStorage } from '@shared/hooks';
+import { useAppDispatch } from '@shared/lib';
 
 const cartKey = 'cart';
 
@@ -8,11 +11,15 @@ export const useProduct = () => {
   const {
     get, remove, set
   } = useLocalStorage();
-  const [cart, setCart] = useState<number[]>([]);
+  const dispatch = useAppDispatch();
+
+  const handleSetCartInStore = (x: number[]) => {
+    dispatch(handleSetCart(x));
+  };
 
   const clearCart = () => {
     remove(cartKey);
-    setCart([]);
+    handleSetCartInStore([]);
   };
 
   const addProduct = (id: number) => {
@@ -28,7 +35,7 @@ export const useProduct = () => {
           if (!parsedCart.includes(id)) {
             parsedCart.push(id);
             set(cartKey, parsedCart);
-            setCart(parsedCart);
+            handleSetCartInStore(parsedCart);
           }
         }
       } catch (_) {
@@ -52,7 +59,7 @@ export const useProduct = () => {
           if (parsedCart.includes(id)) {
             const newCart = parsedCart.filter((x) => x !== id);
             set(cartKey, newCart);
-            setCart(newCart);
+            handleSetCartInStore(newCart);
           }
         } else {
           clearCart();
@@ -73,7 +80,7 @@ export const useProduct = () => {
           Array.isArray(parsedCart)
           && parsedCart.every((x) => typeof x === 'number')
         ) {
-          setCart(parsedCart);
+          handleSetCartInStore(parsedCart);
         } else {
           remove(cartKey);
         }
@@ -86,11 +93,12 @@ export const useProduct = () => {
   useEffect(() => {
     window.addEventListener('storage', fillCart);
     fillCart();
+
+    return () => window.removeEventListener('storage', fillCart);
   }, []);
 
   return {
     addProduct,
-    cart,
     clearCart,
     removeProduct
   };

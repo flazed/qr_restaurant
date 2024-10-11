@@ -4,19 +4,22 @@ import {
 import { Link } from 'react-router-dom';
 
 import {
-  Button, Chip, Divider, Image
+  Button, Chip, Divider
 } from '@nextui-org/react';
 import classNames from 'classnames';
+
+import { ProductInCart } from '@widgets/product-in-cart';
 
 import { useCreateUserOrderMutation } from '@entities/order';
 import { useGetProductsByIDsMutation } from '@entities/product';
 
-import { ProductWeight } from '@shared/ui/product-weight';
-
 import { useProduct } from '@shared/hooks';
+import { useAppSelector } from '@shared/lib';
 import { paths } from '@shared/router';
 
 export const CartPage: FC = () => {
+  const { cart } = useAppSelector((store) => store.cart);
+
   const [
     loadProducts, {
       data: productsList = [],
@@ -26,9 +29,7 @@ export const CartPage: FC = () => {
   const [createOrder, { data: order }] = useCreateUserOrderMutation();
 
   const [isInit, setInit] = useState<boolean>(true);
-  const {
-    cart, clearCart, removeProduct
-  } = useProduct();
+  const { clearCart } = useProduct();
 
   const totalPrice = productsList.reduce((acc, x) => {
     acc += x.price;
@@ -72,49 +73,14 @@ export const CartPage: FC = () => {
         )
       }
       <div className={classNames(
-        'flex flex-col grow-[1] gap-3 mb-10',
+        'flex flex-col flex-grow gap-3 mb-10',
         { 'justify-center items-center': order !== undefined }
       )}
       >
         {
           productsList
             .filter((x) => cart.includes(x.id))
-            .map((product) => (
-              <div
-                className="p-3 bg-gray-100 rounded-3xl flex items-center gap-4"
-                key={product.id}
-              >
-                <div className="w-1/3">
-                  <Image src={product.preview} />
-                </div>
-                <div className="w-2/3 flex flex-col gap-3">
-                  <div>
-                    <span className="text-sm">{product.name}</span>
-                    <p className="text-xs text-gray-400 mb-2">{product.description}</p>
-                    <ProductWeight
-                      type={product.weightType}
-                      weight={product.weight}
-                    />
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold front-mono">
-                      {product.price}
-                      {' '}
-                      ₽
-                    </span>
-                    <Button
-                      className="text-amber-50 font-mono"
-                      color="danger"
-                      onPress={() => removeProduct(product.id)}
-                      size="sm"
-                      isIconOnly
-                    >
-                      <i className="fas fa-trash-alt" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))
+            .map((product) => <ProductInCart key={product.id} withRemove {...product} />)
         }
         {
           order && (

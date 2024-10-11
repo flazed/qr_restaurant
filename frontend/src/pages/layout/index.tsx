@@ -18,9 +18,9 @@ export const IndexLayout: FC = () => {
   };
 
   return (
-    <div className="min-h-[100vh] pb-[68px] flex w-full">
+    <div className="min-h-[100vh] pb-[68px] flex w-full max-w-[768px] mx-auto border-l-gray-300 border-r-gray-300 border-l-1 border-r-1">
       <Outlet />
-      <div className="fixed w-full bottom-0 bg-neutral-800 grid grid-cols-4 gap-1 z-20">
+      <div className="fixed w-full bottom-0 bg-neutral-800 grid grid-cols-4 gap-1 z-20  max-w-[768px]">
         {Object.values(userPaths).map((x) => (
           <Link
             className={classNames(

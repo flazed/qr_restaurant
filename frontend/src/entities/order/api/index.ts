@@ -43,9 +43,19 @@ export const ordersApi = createApi({
         url: `/admin/status/${id}`
       })
     }),
+    getOrderByTable: builder.query<Order, number>({ query: (id) => String(id) }),
     getOrders: builder.query<Order[], void>({
       providesTags: ['Order'],
       query: () => ''
+    }),
+    payUserOrder: builder.mutation<void, { tips: number } & HasId>({
+      invalidatesTags: ['Order'],
+      query: ({ id, ...body }) => ({
+        body,
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+        url: String(id)
+      })
     })
   }),
   reducerPath: 'ordersApi',
@@ -57,5 +67,7 @@ export const {
   useCreateUserOrderMutation,
   useEditOrderMutation,
   useEditOrderStatusMutation,
-  useGetOrdersQuery
+  useGetOrdersQuery,
+  useLazyGetOrderByTableQuery,
+  usePayUserOrderMutation
 } = ordersApi;
