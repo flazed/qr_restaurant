@@ -40,9 +40,11 @@ export const useProduct = () => {
         }
       } catch (_) {
         set(cartKey, [id]);
+        handleSetCartInStore([id]);
       }
     } else {
       set(cartKey, [id]);
+      handleSetCartInStore([id]);
     }
   };
 
@@ -67,6 +69,8 @@ export const useProduct = () => {
       } catch (_) {
         clearCart();
       }
+    } else {
+      clearCart();
     }
   };
 

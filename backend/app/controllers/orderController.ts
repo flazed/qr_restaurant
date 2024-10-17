@@ -68,7 +68,7 @@ const getOrders = async (req: Request, res: Response) => {
           // @ts-ignore
           orders.push({
             ...order,
-            date: `${order.date.toLocaleString()}Z`,
+            date: `${order.date}Z`,
             // @ts-ignore
             products: productsData.map(x => {
               x.name = convertFromHTMLToNormal(x.name)

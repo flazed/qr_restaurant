@@ -31,7 +31,7 @@ export const CartPage: FC = () => {
   const [isInit, setInit] = useState<boolean>(true);
   const { clearCart } = useProduct();
 
-  const totalPrice = productsList.reduce((acc, x) => {
+  const totalPrice = productsList.filter((x) => cart.includes(x.id)).reduce((acc, x) => {
     acc += x.price;
     return acc;
   }, 0);

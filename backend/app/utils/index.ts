@@ -26,7 +26,6 @@ export const convertFromHTMLToNormal = (x: string): string => {
     .replace(/&#x2F;/g, '/')
 }
 
-
 export const getDateForDB = (): string => {
   const date = new Date().toISOString();
   const dateDate = date.split('T')[0]
